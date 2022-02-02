@@ -2,6 +2,8 @@
     "name": "phyzzle",
     "version": "0.1.0",
     "dependencies": [
-        "sdl2"
+        "sdl2",
+        "sdl2-gfx",
+        "sdl2-image"
     ]
 }
