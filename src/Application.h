@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include "./Graphics.h"
+#include "Physics/Constants.h"
 #include "./Physics/Particle.h"
 #include <cstdint>
 
@@ -9,14 +10,15 @@ class Application {
     private:
         bool running = false;
 
-        std::uint32_t last_frame_time_ticks = 0;
-        float dt = 0.0f;
+        int previous_frame_time_ms = 0;
+        float dt_seconds = 0.0f;
 
         Particle particle = {
-            .position = {50.0f, 100.0f},
-            .velocity = {0.0f, 0.0f},
-            .acceleration = {0.0f, 0.1f},
-            .mass = 1.0f
+            .position = {100.0f, 100.0f},
+            .velocity = Vec2{-1.0f, 0.0f} * pixels_per_meter,
+            .acceleration = Vec2{-1.0f, 0.0f} * pixels_per_meter,
+            .mass = 1.0f,
+            .radius = 4
         };
 
     public:

@@ -9,6 +9,7 @@ struct Particle {
     Vec2 acceleration;
 
     float mass;
+    int radius;
 };
 
 #endif
