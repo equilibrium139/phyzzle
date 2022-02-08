@@ -8,6 +8,9 @@ bool Application::IsRunning() {
 
 void Application::Setup() {
     running = Graphics::OpenWindow();
+
+    particles.emplace_back(Vec2{ 100.0f, 100.0f }, 1.0f, 4);
+    particles.emplace_back(Vec2{ 100.0f, 200.0f }, 3.0f, 12);
 }
 
 void Application::Input() {
@@ -41,38 +44,43 @@ void Application::Update() {
 
     previous_frame_time_ms = current_time;
     
-    particle.velocity += particle.acceleration * dt_seconds;
-    particle.position += particle.velocity * dt_seconds;
+    for (auto& particle : particles)
+    {
+        particle.AddForce(Vec2(2.0f * pixels_per_meter, 0.0f));
+        particle.AddForce(Vec2(0.0f, 9.8f / particle.inverse_mass * pixels_per_meter));
 
-    // Switch from meters to pixels
-    if (particle.position.x - particle.radius < 0)
-    {
-        particle.velocity.x = std::abs(particle.velocity.x);
-        particle.acceleration.x = std::abs(particle.acceleration.x);
+        particle.Integrate(dt_seconds);
 
-        if (particle.velocity.x == 0.0f) particle.velocity.x = 10.0f;
-    }
-    else if (particle.position.x + particle.radius >= Graphics::Width())
-    {
-        particle.velocity.x = -std::abs(particle.velocity.x);
-        particle.acceleration.x = -std::abs(particle.acceleration.x);
-    }
+        if (particle.position.x - particle.radius < 0)
+        {
+            particle.velocity.x *= -1.0f;
+            particle.position.x = particle.radius;
+        }
+        else if (particle.position.x + particle.radius >= Graphics::Width())
+        {
+            particle.velocity.x *= -1.0f;
+            particle.position.x = Graphics::Width() - particle.radius - 1;
+        }
 
-    if (particle.position.y - particle.radius < 0)
-    {
-        particle.velocity.y = std::abs(particle.velocity.y);
-        particle.acceleration.y = std::abs(particle.acceleration.y);
-    }
-    else if (particle.position.y + particle.radius >= Graphics::Height())
-    {
-        particle.velocity.y = -std::abs(particle.velocity.y);
-        particle.acceleration.y = -std::abs(particle.acceleration.y);
+        if (particle.position.y - particle.radius < 0)
+        {
+            particle.velocity.y *= -1.0f;
+            particle.position.y = particle.radius;
+        }
+        else if (particle.position.y + particle.radius >= Graphics::Height())
+        {
+            particle.velocity.y *= -1.0f;
+            particle.position.y = Graphics::Height() - particle.radius - 1;
+        }
     }
 }
 
 void Application::Render() {
     Graphics::ClearScreen(0xFF056263);
-    Graphics::DrawFillCircle((int)particle.position.x, (int)particle.position.y, particle.radius, 0xFFFFFFFF);
+    for (const auto& particle : particles)
+    {
+        Graphics::DrawFillCircle((int)particle.position.x, (int)particle.position.y, particle.radius, 0xFFFFFFFF);
+    }
     Graphics::RenderFrame();
 }
 
