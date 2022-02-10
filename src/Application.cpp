@@ -12,6 +12,13 @@ void Application::Setup() {
 
     particles.emplace_back(Vec2{ 100.0f, 100.0f }, 1.0f, 4);
     particles.emplace_back(Vec2{ 100.0f, 200.0f }, 3.0f, 12);
+
+    fluid_area = {
+        .x = 0,
+        .y = Graphics::Height() / 2,
+        .w = Graphics::Width(),
+        .h = Graphics::Height() / 2
+    };
 }
 
 void Application::Input() {
@@ -46,11 +53,48 @@ void Application::Update() {
     if (dt_seconds > ms_per_frame) dt_seconds = ms_per_frame;
 
     previous_frame_time_ms = current_time;
+
+    static Vec2 wind_force{ 2.0f * pixels_per_meter, 0.0f };
+    static float gravity = 9.8f;
+
+    Graphics::BeginImGuiFrame();
+
+    {
+        static int counter = 0;
+
+        ImGui::Begin("Hello, world!");
+
+        ImGui::Text("This is some useful text.");
+
+        ImGui::SliderFloat("Gravity", &gravity, -100.0f, 100.0f);
+
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+    }
     
     for (auto& particle : particles)
     {
-        particle.AddForce(Vec2(2.0f * pixels_per_meter, 0.0f));
-        particle.AddForce(Vec2(0.0f, 9.8f / particle.inverse_mass * pixels_per_meter));
+        particle.AddForce(wind_force);
+        particle.AddForce(Vec2(0.0f, (gravity / particle.inverse_mass) * pixels_per_meter));
+
+        SDL_Rect bounding_box = {
+            .x = int(particle.position.x - particle.radius),
+            .y = int(particle.position.y - particle.radius),
+            .w = int(particle.radius * 2),
+            .h = int(particle.radius * 2)
+        };
+
+        if (SDL_HasIntersection(&fluid_area, &bounding_box))
+        {
+            Vec2 opposite_velocity_dir = -particle.velocity.UnitVector();
+            float drag_force_magnitude = particle.velocity.MagnitudeSquared();
+            const float k = 0.01f;
+            Vec2 drag_force = opposite_velocity_dir * k * drag_force_magnitude;
+            particle.AddForce(drag_force);
+        }
 
         particle.Integrate(dt_seconds);
 
@@ -79,13 +123,15 @@ void Application::Update() {
 }
 
 void Application::Render() {
-    Graphics::BeginFrame(0xFF056263);
+    Graphics::ClearScreen(0xFF056263);
 
+    Graphics::DrawFillRect(fluid_area, 0xFF0000FF);
 
     for (const auto& particle : particles)
     {
         Graphics::DrawFillCircle((int)particle.position.x, (int)particle.position.y, particle.radius, 0xFFFFFFFF);
     }
+
 
     ImGui::ShowDemoWindow();
 

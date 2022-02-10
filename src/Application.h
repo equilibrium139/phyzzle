@@ -14,6 +14,9 @@ class Application {
         float dt_seconds = 0.0f;
 
         std::vector<Particle> particles;
+
+        SDL_Rect fluid_area;
+
     public:
         Application() = default;
         ~Application() = default;

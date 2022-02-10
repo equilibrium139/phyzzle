@@ -67,12 +67,11 @@ void Graphics::ClearScreen(Uint32 color) {
     SDL_RenderClear(renderer);
 }
 
-void Graphics::BeginFrame(Uint32 clear_color)
+void Graphics::BeginImGuiFrame()
 {
     ImGui_ImplSDLRenderer_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-    ClearScreen(clear_color);
 }
 
 void Graphics::RenderFrame() {
@@ -94,15 +93,14 @@ void Graphics::DrawFillCircle(int x, int y, int radius, Uint32 color) {
     filledCircleColor(renderer, x, y, radius, color);
 }
 
-void Graphics::DrawRect(int x, int y, int width, int height, Uint32 color) {
-    lineColor(renderer, x - width / 2.0, y - height / 2.0, x + width / 2.0, y - height / 2.0, color);
-    lineColor(renderer, x + width / 2.0, y - height / 2.0, x + width / 2.0, y + height / 2.0, color);
-    lineColor(renderer, x + width / 2.0, y + height / 2.0, x - width / 2.0, y + height / 2.0, color);
-    lineColor(renderer, x - width / 2.0, y + height / 2.0, x - width / 2.0, y - height / 2.0, color);
+void Graphics::DrawRect(const SDL_Rect& rect, Uint32 color) {
+    SDL_RenderDrawRect(renderer, &rect);
 }
 
-void Graphics::DrawFillRect(int x, int y, int width, int height, Uint32 color) {
-    boxColor(renderer, x - width / 2.0, y - height / 2.0, x + width / 2.0, y + height / 2.0, color);
+void Graphics::DrawFillRect(const SDL_Rect& rect, Uint32 color) {
+    //SDL_GetRenderDrawColor(renderer, &r, &g, &b, &a);
+    SDL_SetRenderDrawColor(renderer, (color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, color >> 24);
+    SDL_RenderFillRect(renderer, &rect);
 }
 
 void Graphics::DrawPolygon(int x, int y, const std::vector<Vec2>& vertices, Uint32 color) {

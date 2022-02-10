@@ -17,13 +17,13 @@ struct Graphics {
     static bool OpenWindow();
     static void CloseWindow();
     static void ClearScreen(Uint32 color);
-    static void BeginFrame(Uint32 clear_color);
+    static void BeginImGuiFrame();
     static void RenderFrame();
     static void DrawLine(int x0, int y0, int x1, int y1, Uint32 color);
     static void DrawCircle(int x, int y, int radius, float angle, Uint32 color);
     static void DrawFillCircle(int x, int y, int radius, Uint32 color);
-    static void DrawRect(int x, int y, int width, int height, Uint32 color);
-    static void DrawFillRect(int x, int y, int width, int height, Uint32 color);
+    static void DrawRect(const SDL_Rect& rect, Uint32 color);
+    static void DrawFillRect(const SDL_Rect& rect, Uint32 color);
     static void DrawPolygon(int x, int y, const std::vector<Vec2>& vertices, Uint32 color);
     static void DrawFillPolygon(int x, int y, const std::vector<Vec2>& vertices, Uint32 color);
     static void DrawTexture(int x, int y, int width, int height, float rotation, SDL_Texture* texture);
