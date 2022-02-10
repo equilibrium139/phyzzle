@@ -4,6 +4,10 @@
     "dependencies": [
         "sdl2",
         "sdl2-gfx",
-        "sdl2-image"
+        "sdl2-image",
+        {
+            "name": "imgui",
+            "features": ["sdl2-binding", "sdl2-renderer-binding"]
+        }
     ]
 }

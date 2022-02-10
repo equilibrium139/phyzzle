@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "Physics/Constants.h"
 #include <iostream>
+#include "imgui_impl_sdl.h"
 
 bool Application::IsRunning() {
     return running;
@@ -16,6 +17,8 @@ void Application::Setup() {
 void Application::Input() {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+
         switch (event.type) {
             case SDL_QUIT:
                 running = false;
@@ -76,11 +79,16 @@ void Application::Update() {
 }
 
 void Application::Render() {
-    Graphics::ClearScreen(0xFF056263);
+    Graphics::BeginFrame(0xFF056263);
+
+
     for (const auto& particle : particles)
     {
         Graphics::DrawFillCircle((int)particle.position.x, (int)particle.position.y, particle.radius, 0xFFFFFFFF);
     }
+
+    ImGui::ShowDemoWindow();
+
     Graphics::RenderFrame();
 }
 

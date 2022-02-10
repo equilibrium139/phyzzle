@@ -1,6 +1,14 @@
 #include "Graphics.h"
 #include <iostream>
 
+#include "imgui.h"
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_sdlrenderer.h"
+
+#if !SDL_VERSION_ATLEAST(2,0,17)
+#error This ImGui backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
+#endif
+
 SDL_Window* Graphics::window = NULL;
 SDL_Renderer* Graphics::renderer = NULL;
 int Graphics::windowWidth = 0;
@@ -19,20 +27,38 @@ bool Graphics::OpenWindow() {
         std::cerr << "Error initializing SDL" << std::endl;
         return false;
     }
+
     SDL_DisplayMode display_mode;
     SDL_GetCurrentDisplayMode(0, &display_mode);
     windowWidth = display_mode.w;
     windowHeight = display_mode.h;
-    window = SDL_CreateWindow(NULL, 0, 0, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
+    window = SDL_CreateWindow(NULL, 0, 0, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         std::cerr << "Error creating SDL window" << std::endl;
         return false;
     }
+
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer) {
         std::cerr << "Error creating SDL renderer" << std::endl;
         return false;
     }
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL2_InitForSDLRenderer(window);
+    ImGui_ImplSDLRenderer_Init(renderer);
+
     return true;
 }
 
@@ -41,7 +67,17 @@ void Graphics::ClearScreen(Uint32 color) {
     SDL_RenderClear(renderer);
 }
 
+void Graphics::BeginFrame(Uint32 clear_color)
+{
+    ImGui_ImplSDLRenderer_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+    ClearScreen(clear_color);
+}
+
 void Graphics::RenderFrame() {
+    ImGui::Render();
+    ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     SDL_RenderPresent(renderer);
 }
 

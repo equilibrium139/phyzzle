@@ -21,11 +21,13 @@ add_executable(phyzzle src/Main.cpp
 find_package(SDL2 CONFIG REQUIRED)
 find_package(sdl2-gfx CONFIG REQUIRED)
 find_package(sdl2-image CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 target_link_libraries(phyzzle PRIVATE SDL2::SDL2
                                       SDL2::SDL2main
                                       SDL2::SDL2_gfx
                                       SDL2::SDL2_image
+                                      imgui::imgui
 )
 
 if(MSVC)
