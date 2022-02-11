@@ -12,6 +12,8 @@ add_executable(phyzzle src/Main.cpp
                        src/Graphics.cpp
                        src/Graphics.h
                        src/Physics/Constants.h
+					   src/Physics/Forces.cpp
+					   src/Physics/Forces.h
                        src/Physics/Particle.cpp
                        src/Physics/Particle.h
                        src/Physics/Vec2.cpp

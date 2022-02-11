@@ -13,6 +13,7 @@ struct Particle {
     Vec2 acceleration;
     Vec2 sum_forces;
 
+    float mass;
     float inverse_mass;
     int radius;
 };

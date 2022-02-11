@@ -15,8 +15,6 @@ class Application {
 
         std::vector<Particle> particles;
 
-        SDL_Rect fluid_area;
-
     public:
         Application() = default;
         ~Application() = default;
